@@ -9,66 +9,72 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_A
 }
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL, 
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
 const HomePage = () => {
-    const router = useRouter();
-    const [participants, setParticipants] = useState<Participant[]>([]);
-    const [selectedParticipant, setSelectedParticipant] = useState('');
+  const router = useRouter();
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [selectedParticipant, setSelectedParticipant] = useState('');
 
-    useEffect(() => {
-        const fetchParticipants = async () => {
-            const { data, error } = await supabase
-                .from('participants') // Assuming you have a 'participants' table
-                .select('*');
+  useEffect(() => {
+    const fetchParticipants = async () => {
+      const { data, error } = await supabase
+        .from('participants') // Assuming you have a 'participants' table
+        .select('*');
 
-            if (error) {
-                console.error('Error fetching participants:', error);
-            } else {
-                setParticipants(data as Participant[]);
-            }
-        };
+      if (error) {
+        console.error('Error fetching participants:', error);
+      } else {
+        setParticipants(data as Participant[]);
+      }
+    };
 
-        fetchParticipants();
-    }, []);
+    fetchParticipants();
+  }, []);
 
-// In your component
-const handleSubmit = (e: FormEvent) => {
-  e.preventDefault(); // Prevent default form submission
+  // In your component
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
 
-  if (!selectedParticipant) {
+    if (!selectedParticipant) {
       // Optionally handle the case where no participant is selected
       alert("Please select a participant before proceeding.");
       return;
-  }
+    }
 
-  // Redirect to the quiz page with the selected participant ID
-  router.push(`/quiz/${selectedParticipant}`);
-};
+    // Redirect to the quiz page with the selected participant ID
+    router.push(`/quiz/${selectedParticipant}`);
+  };
 
-    return (
-        <div style={{ padding: '20px' }}>
-            <form onSubmit={handleSubmit}>
-                <select
-                    value={selectedParticipant}
-                    onChange={(e) => setSelectedParticipant(e.target.value)}
-                    required
-                >
-                    <option value="">Select your name</option>
-                    {participants.map((participant) => (
-                        <option key={participant.id} value={participant.id}>
-                            {participant.name} {/* Assuming each participant has a 'name' field */}
-                        </option>
-                    ))}
-                </select>
-                <button type="submit" style={{ marginLeft: '10px' }}>
-                    Start Quiz
-                </button>
-            </form>
-        </div>
-    );
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>De  grote familie Cleymans-Kerstens quiz</h2>
+      <img
+      src="/fam.jpg" // Replace with the actual path to your image
+      alt="Description of the image" // Provide a description for accessibility
+      style={{ width: '100%', height: 'auto', marginBottom: '20px' }} // Adjust styles as needed
+    />
+      <form onSubmit={handleSubmit}>
+        <select
+          value={selectedParticipant}
+          onChange={(e) => setSelectedParticipant(e.target.value)}
+          required
+        >
+          <option value="">Select your name</option>
+          {participants.map((participant) => (
+            <option key={participant.id} value={participant.id}>
+              {participant.name} {/* Assuming each participant has a 'name' field */}
+            </option>
+          ))}
+        </select>
+        <button type="submit" style={{ marginLeft: '10px' }}>
+          Start Quiz
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default HomePage;
