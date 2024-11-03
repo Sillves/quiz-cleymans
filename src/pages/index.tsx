@@ -50,7 +50,6 @@ const handleSubmit = (e: FormEvent) => {
 
     return (
         <div style={{ padding: '20px' }}>
-            <h1>Select Your Name</h1>
             <form onSubmit={handleSubmit}>
                 <select
                     value={selectedParticipant}
