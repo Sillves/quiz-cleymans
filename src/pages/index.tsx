@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
+import { Participant } from './types'; // Import your Participant interface
+import { FormEvent } from 'react';
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
   throw new Error('Missing Supabase environment variables');
@@ -13,7 +15,7 @@ const supabase = createClient(
 
 const HomePage = () => {
     const router = useRouter();
-    const [participants, setParticipants] = useState([]);
+    const [participants, setParticipants] = useState<Participant[]>([]);
     const [selectedParticipant, setSelectedParticipant] = useState('');
 
     useEffect(() => {
@@ -25,18 +27,26 @@ const HomePage = () => {
             if (error) {
                 console.error('Error fetching participants:', error);
             } else {
-                setParticipants(data);
+                setParticipants(data as Participant[]);
             }
         };
 
         fetchParticipants();
     }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Redirect to the quiz page with the selected participant ID
-        router.push(`/quiz/${selectedParticipant}`);
-    };
+// In your component
+const handleSubmit = (e: FormEvent) => {
+  e.preventDefault(); // Prevent default form submission
+
+  if (!selectedParticipant) {
+      // Optionally handle the case where no participant is selected
+      alert("Please select a participant before proceeding.");
+      return;
+  }
+
+  // Redirect to the quiz page with the selected participant ID
+  router.push(`/quiz/${selectedParticipant}`);
+};
 
     return (
         <div style={{ padding: '20px' }}>

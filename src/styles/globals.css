@@ -58,3 +58,8 @@ button:hover {
   height: 100%; /* Allow the root to take full height */
   width: 100%; /* Ensure it takes full width */
 }
+
+h2 {
+  font-size: 2rem; /* Adjust the size as needed */
+  font-weight: bold; /* Make it bold */
+}

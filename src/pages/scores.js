@@ -12,24 +12,39 @@ const Scores = () => {
 
     useEffect(() => {
         const fetchScores = async () => {
-            const { data, error } = await supabase
-                .from('answers')
-                .select('participant_id, is_correct, participants(name)') // Join with participants table
-                .eq('is_correct', true); // Fetch only correct answers
+            // Fetch all participants
+            const { data: participants, error: participantError } = await supabase
+                .from('participants')
+                .select('id, name'); // Get all participants
 
-            if (error) {
-                console.error('Error fetching scores:', error);
-            } else {
-                const scoreMap = data.reduce((acc, { participant_id, participants }) => {
-                    const name = participants.name; // Get participant name from the join
-                    acc[name] = (acc[name] || 0) + 1; // Increment score for each correct answer
-                    return acc;
-                }, {});
-
-                const scoresArray = Object.entries(scoreMap).map(([name, score]) => ({ name, score }));
-                setScores(scoresArray);
+            if (participantError) {
+                console.error('Error fetching participants:', participantError);
+                setLoading(false);
+                return;
             }
 
+            // Fetch answers and aggregate scores
+            const { data: answers, error: answerError } = await supabase
+                .from('answers')
+                .select('participant_id, is_correct');
+
+            if (answerError) {
+                console.error('Error fetching answers:', answerError);
+                setLoading(false);
+                return;
+            }
+
+            // Create a score map
+            const scoreMap = participants.map(participant => {
+                const participantAnswers = answers.filter(ans => ans.participant_id === participant.id);
+                const correctAnswersCount = participantAnswers.filter(ans => ans.is_correct).length; // Count correct answers
+                return { name: participant.name, score: correctAnswersCount }; // Return name and score
+            });
+
+            // Sort participants by score in descending order
+            scoreMap.sort((a, b) => b.score - a.score);
+
+            setScores(scoreMap);
             setLoading(false);
         };
 
@@ -43,7 +58,12 @@ const Scores = () => {
             <h2>Scores</h2>
             <ul>
                 {scores.map(({ name, score }, index) => (
-                    <li key={index}>{name}: {score}</li> // Use a unique key for each item
+                    <li key={index}>
+                        {index === 0 && '🥇'} {/* Gold medal for 1st place */}
+                        {index === 1 && '🥈'} {/* Silver medal for 2nd place */}
+                        {index === 2 && '🥉'} {/* Bronze medal for 3rd place */}
+                        {name}: {score}
+                    </li>
                 ))}
             </ul>
         </div>

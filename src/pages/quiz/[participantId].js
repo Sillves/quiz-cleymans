@@ -67,7 +67,7 @@ export default function Quiz({ participantId }) {
 
     return (
         <div>
-            <h1>{currentQuestion.question_text}</h1>
+            <h2>{currentQuestion.question_text}</h2>
             {options.map((option) => (
                 <div
                 key={option}
